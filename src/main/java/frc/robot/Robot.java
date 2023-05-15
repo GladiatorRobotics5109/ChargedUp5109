@@ -58,7 +58,7 @@ public class Robot extends TimedRobot {
   private static final String kWillMode = "kWillMode";
   
 
-  private final LightController m_lightController = new LightController(0, 50+73);
+  private final LightController m_lightController = new LightController(0, 123);
   
   private String m_autoSelected;
 
