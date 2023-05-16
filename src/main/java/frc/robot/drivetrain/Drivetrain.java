@@ -124,10 +124,7 @@ public class Drivetrain {
 
   private float prevPitch = 0.0f;
   private float integral = 0.0f;
-  // for rateOfChange method...
-  private boolean firstTimeAutoBalanceRan = true;
-  private double startTime = 0.0;
-  private double elapsedTime = 0.0;
+  
   public boolean autoBalance() // auto balance for the charging station
   {
     boolean retVal = false;
@@ -157,36 +154,41 @@ public class Drivetrain {
     prevPitch = pitch;
 
     return retVal;
+  }
 
-    // if (firstTimeAutoBalanceRan)
-    // {
-    //     startTime = Timer.getFPGATimestamp();
-    // }
-    // elapsedTime = Timer.getFPGATimestamp() - startTime;
+  private boolean firstTimeAutoBalanceRan = true;
+  private double startTime = 0.0;
+  private double elapsedTime = 0.0;
 
+  public boolean autoBalanceRateOfChange() {
+    // used for adding a delay when checking rateOfChange
+    if (firstTimeAutoBalanceRan) {
+      startTime = Timer.getFPGATimestamp();
+    }
+    elapsedTime = Timer.getFPGATimestamp() - startTime;
+
+    float pitch = navX.getRoll() - Constants.kNavXOffsetAlign; // pitch is offset by abt 2
     
-    // float pitch = navX.getRoll() - Constants.kNavXOffsetAlign; //pitch is offset by 2
-    // // constants
-    // float kRateOfChangeThreshold = 0.13f;
-    // float kDriveSpeed = 0.68f; // m/s
-    // float kDeadzone = 1f; //degrees (2.5 is max allowed on docs)
+    // constants
+    final float kRateOfChangeThreshold = 0.13f; // threshold to cut pwr
+    final float kDriveSpeed = 0.68f; // m/s
+    final float kDeadzone = 1.0f; // degrees (2.5 is max allowed on docs)
 
-    // if ((pitch - prevPitch) / 20f >= kRateOfChangeThreshold && elapsedTime >= 2.0)
-    // {
-    //   drive(0, 0, 0, true);
-    //   System.out.println("hit threshold");
-    //   return false;
-    // }
-    // else if (Math.abs(pitch) <= kDeadzone)
-    // {
-    //   drive(0, 0, 0, true);
-    //   System.out.println("balanced.");
-    //   return true;
-    // }
-    // else
-    // {
-    //   drive(kDriveSpeed, 0, 0, true);
-    // }
+    float rateOfChange = (pitch - prevPitch) / 20f;
+
+    if (rateOfChange >= kRateOfChangeThreshold && elapsedTime >= 2.0) { // rate of change hit.
+      drive(0, 0, 0, true);
+      System.out.println("AutoBalance hit threshold");
+      elapsedTime = 0; // reset elapsed time so it doesn't start driving again
+      return false;
+    } else if (Math.abs(pitch) <= kDeadzone) { // balanced
+      drive(0, 0, 0, true);
+      System.out.println("AutoBalance balanced.");
+      return true;
+    } else {
+      drive(kDriveSpeed, 0, 0, true);
+      return false;
+    }
   }
 
   /**
