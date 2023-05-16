@@ -271,13 +271,6 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("y_odom", position.getY());
     SmartDashboard.putNumber("current", m_arm.m_pdp.getCurrent(14));
     // m_swerve.ntwrkInst.getTable(Constants.kTableInstance).putValue("angle", NetworkTableValue.makeDouble(Rotation2d.fromDegrees().getRadians()));
-
-
-
-
-
-
-
   }
 
   Pose2d target;
@@ -500,7 +493,7 @@ public class Robot extends TimedRobot {
     }
     if (!m_reached) {
       m_reached = m_swerve.driveTo(m_scoringController.continueInput());
-    }else {
+    } else {
       driveWithJoystick(true);
     }
   }
