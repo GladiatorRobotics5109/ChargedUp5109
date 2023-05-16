@@ -10,4 +10,6 @@ public class Constants {
     public static final String kTableEntryPose =  "pose";
     public static final String kTableEntryCubePoses = "cubePos";
     public static final String kTableEntryConePoses = "conePos";
+
+    public static final RgbMode kActiveRgbMode = RgbMode.UnicornVomit;
 }

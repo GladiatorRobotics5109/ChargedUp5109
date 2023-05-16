@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.util.ITest;
+import frc.robot.util.RgbMode;
 
 public class LightController implements ITest {
     private AddressableLED m_addressableLED;
@@ -14,6 +15,32 @@ public class LightController implements ITest {
         m_addressableLED = new AddressableLED(lightStripChannel);
         m_ledBuffer = new AddressableLEDBuffer(lightChannelLength);
         m_addressableLED.setLength(m_ledBuffer.getLength());
+    }
+
+    // dk why i can't do (RgbColor mode, int offset = 0) but wtv... why java :(
+    // sets the current rgb mode
+    public void set(RgbMode mode, DriverStation.Alliance alliance, int offset, boolean fieldRelative) {
+        if (mode == RgbMode.AllianceColor) {
+            setAllianceColor(alliance);
+        } else if (mode == RgbMode.BalanceColor) {
+            setBalanceColor();
+        } else if (mode == RgbMode.KevinBuggedOutBug) {
+            setKevinBuggedOutBug(offset, fieldRelative);
+        } else if (mode == RgbMode.UnicornVomit) {
+            setUnicornVomit(offset, fieldRelative);
+        }
+    }
+    // sets a RgbMode with default parameters
+    public void set(RgbMode mode) {
+        if (mode == RgbMode.AllianceColor) {
+            setAllianceColor(DriverStation.getAlliance());
+        } else if (mode == RgbMode.BalanceColor) {
+            setBalanceColor();
+        } else if (mode == RgbMode.KevinBuggedOutBug) {
+            setKevinBuggedOutBug(0, false);
+        } else if (mode == RgbMode.UnicornVomit) {
+            setUnicornVomit(0, false);
+        }
     }
 
     public void setAllianceColor(DriverStation.Alliance alliance) {
@@ -47,13 +74,14 @@ public class LightController implements ITest {
         m_addressableLED.start();
     }
     
-    // sets the lightstrips to be unicorn vomit
+    // sets the light-strips to be unicorn vomit
     public void setUnicornVomit(int offset, boolean fieldRelative) {
         int hueVal = 0;
 
         for (int i = 0; i < m_ledBuffer.getLength(); i++) {
             m_ledBuffer.setHSV(i, (int) (((double) hueVal / (double) m_ledBuffer.getLength() + 40) * 180), 255, 255);
             hueVal += 1;
+            // account for places where there isn't any LEDs
             if (i % 26 == 0) {
                 hueVal += 10;
             }
@@ -68,7 +96,7 @@ public class LightController implements ITest {
     }
 
     // sets the lightstrips to be kevin's bugged out janked out bug
-    public void setKevinsBuggedOutBug(int offset, boolean fieldRelative) {
+    public void setKevinBuggedOutBug(int offset, boolean fieldRelative) {
 
         for (int i = 0; i < m_ledBuffer.getLength(); i++) {
             if (i >= m_ledBuffer.getLength() / 2) {
@@ -98,7 +126,7 @@ public class LightController implements ITest {
         }
     }
     
-    // make a LED buffer field relative!!
+    // make any LED buffer field relative!!
     private AddressableLEDBuffer fieldRelativize(AddressableLEDBuffer buffer, int heading)
     {
         int bufferLength = buffer.getLength();

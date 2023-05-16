@@ -40,6 +40,7 @@ import frc.robot.util.ButtonState;
 import frc.robot.util.Constants;
 import frc.robot.util.ControllerState;
 import frc.robot.util.DriverModes;
+import frc.robot.util.RgbMode;
 import frc.robot.util.TeleopMethods;
 import java.util.HashMap;
 
@@ -69,8 +70,8 @@ public class Robot extends TimedRobot {
   private final SendableChooser<String> m_teleopChooser = new SendableChooser<>();
   private DriverModes m_driveMode = DriverModes.kWillMode;
 
-  private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(10);
-  private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(10);
+  private final SlewRateLimiter m_xSpeedLimiter = new SlewRateLimiter(10);
+  private final SlewRateLimiter m_ySpeedLimiter = new SlewRateLimiter(10);
   private final SlewRateLimiter m_rotLimiter = new SlewRateLimiter(1);
 
   private boolean m_reached = true;
@@ -112,14 +113,14 @@ public class Robot extends TimedRobot {
      * Inverted since Xbox joysticks return flipped values.
      * 
      **/
-    final double xSpeed = -m_xspeedLimiter.calculate(MathUtil.applyDeadband(xController.getLeftY(), 0.2))
+    final double xSpeed = -m_xSpeedLimiter.calculate(MathUtil.applyDeadband(xController.getLeftY(), 0.2))
         * m_swerve.m_maxSpeed;
     /**
      * Get desired Y (strafe/sideways) speed of chassis.
      * Positive = left, negative = right.
      * XBox controllers return flipped values.
      **/
-    final double ySpeed = -m_yspeedLimiter.calculate(MathUtil.applyDeadband(xController.getLeftX(), 0.2))
+    final double ySpeed = -m_ySpeedLimiter.calculate(MathUtil.applyDeadband(xController.getLeftX(), 0.2))
         * m_swerve.m_maxSpeed;
     /**
      * Get desired rotation speed of chassis.
@@ -271,13 +272,6 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("y_odom", position.getY());
     SmartDashboard.putNumber("current", m_arm.m_pdp.getCurrent(14));
     // m_swerve.ntwrkInst.getTable(Constants.kTableInstance).putValue("angle", NetworkTableValue.makeDouble(Rotation2d.fromDegrees().getRadians()));
-
-
-
-
-
-
-
   }
 
   Pose2d target;
@@ -295,7 +289,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     Constants.kNavXOffsetAlign = m_swerve.navX.getRoll();
-    m_lightController.setAllianceColor(DriverStation.getAlliance());
+    m_lightController.set(RgbMode.AllianceColor);
     m_autoSelected = m_chooser.getSelected();
     m_swerve.navX.reset();
     m_swerve.navX.setAngleAdjustment(180);
@@ -385,7 +379,7 @@ public class Robot extends TimedRobot {
           }
           break;
           case 6:
-          m_lightController.setBalanceColor();
+          m_lightController.set(RgbMode.BalanceColor);
           m_swerve.drive(0,0,0,true);
           m_swerve.brake();
         }
@@ -455,52 +449,51 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    m_lightController.setUnicornVomit((int)(m_swerve.navX.getAngle()/2), true);
+    m_lightController.set(Constants.kActiveRgbMode, DriverStation.getAlliance(), 
+        (int)(m_swerve.navX.getAngle() / 2), true);
+    
     m_swerve.setMaxSpeed(m_driveMode.checkState(xController));
-    if (xController.getRightTriggerAxis() > 0.5)
-    {
-      m_arm.release();
-    }
-    else
-    {
-      m_arm.grip();
-    }
-    if (jStick.getRawButtonPressed(3))
-    {
+
+    /* Joystick Controller bindings... */
+
+    if (jStick.getRawButtonPressed(3)) {
       m_pickupNotifier.startSingle(0.1);
     }
-    if (jStick.getRawButtonPressed(2))
-    {
+    if (jStick.getRawButtonPressed(2)) {
       m_resetNotifier.startSingle(0.1);
     }
-    if (jStick.getTriggerPressed())
-    {
+    if (jStick.getTriggerPressed()) {
       m_placeNotifier.startSingle(0.1);
     }
-
     if (jStick.getRawButtonPressed(4)) {
       m_coneNotifier.startSingle(0.1);
-    }
-    if (xController.getYButtonPressed()) {
-      m_rotateNotifier.startSingle(0.1);
     }
     if (jStick.getRawButtonPressed(5)) {
       m_midNotifier.startSingle(0.1);
     }
+
+    /* XBox Controller bindings... */
+    
+    if (xController.getRightTriggerAxis() > 0.5) {
+      m_arm.release();
+    } else {
+      m_arm.grip();
+    }
+    if (xController.getYButtonPressed()) {
+      m_rotateNotifier.startSingle(0.1);
+    }
     if (xController.getXButtonPressed()) {
       m_arm.raise();
     }
-
     if (xController.getBButtonPressed()) {
       m_arm.lower();
     }
-
     if (xController.getAButtonPressed()) {
       m_reached = true;
     }
     if (!m_reached) {
       m_reached = m_swerve.driveTo(m_scoringController.continueInput());
-    }else {
+    } else {
       driveWithJoystick(true);
     }
   }
@@ -513,13 +506,15 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledPeriodic() {
     // m_swerve.align();
+    m_lightController.set(Constants.kActiveRgbMode, DriverStation.getAlliance(),
+        (int) (m_swerve.navX.getAngle() / 2), true);
   }
 
   /** This function is called once when test mode is enabled. */
   @Override
   public void testInit() {
-    m_swerve.resetEncoders();
-    m_lightController.setAllianceColor(DriverStation.getAlliance());
+    m_swerve.resetEncoders();;
+    m_lightController.set(RgbMode.AllianceColor);
     m_arm.initAuto();
     // System.out.println(Units.inchesToMeters(49));
     // m_arm.m_extenderController.setReference(Units.inchesToMeters(49), ControlType.kPosition);
