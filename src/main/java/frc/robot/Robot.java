@@ -6,27 +6,14 @@ package frc.robot;
 
 import java.util.HashMap;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
-import com.revrobotics.CANSparkMax.ControlType;
-
-import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.cscore.CvSink;
-import edu.wpi.first.cscore.CvSource;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.networktables.NetworkTableValue;
-import edu.wpi.first.vision.VisionPipeline;
-import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Notifier;
-import edu.wpi.first.wpilibj.PneumaticsModuleType;
-import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
@@ -42,7 +29,6 @@ import frc.robot.util.ControllerState;
 import frc.robot.util.DriverModes;
 import frc.robot.util.RgbMode;
 import frc.robot.util.TeleopMethods;
-import java.util.HashMap;
 
 
 /**

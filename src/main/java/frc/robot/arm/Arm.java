@@ -100,7 +100,7 @@ public class Arm implements ITest, IInit {
         // m_gripper.grip();
         m_extenderController.setReference(Units.inchesToMeters(35), ControlType.kPosition);
         m_armState = ArmState.kReset;
-        Timer.delay(.5);
+        Timer.delay(0.5);
         m_rotatorController.setReference(-Math.PI/2, ControlType.kPosition);
         
     }

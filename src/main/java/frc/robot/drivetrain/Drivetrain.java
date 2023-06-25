@@ -129,10 +129,10 @@ public class Drivetrain {
   {
     boolean retVal = false;
     float pitch = navX.getRoll() - Constants.kNavXOffsetAlign; //pitch is offset by 2
-    integral += pitch*0.01f;
+    integral += pitch * 0.01f;
     //System.out.println("Current Pitch: " + pitch);
     
-    float deadzone = .2f; //degrees (2.5 is max allowed on docs)
+    float deadzone = 0.2f; //degrees (2.5 is max allowed on docs)
     integral = Math.max(integral, 0.1f);
 
     if (Math.abs(pitch) > deadzone)
