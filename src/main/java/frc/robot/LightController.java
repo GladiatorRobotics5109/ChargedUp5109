@@ -112,7 +112,7 @@ public class LightController implements ITest {
                 overflowStartIndex = i;
                 break;
             }
-            fieldRelativeBuffer.setLED(i + heading, buffer.getLED(i));
+            //fieldRelativeBuffer.setLED(i + heading, buffer.getLED(i));
         }
 
         for (int i = 0; i < overflowStartIndex; i++) // set LED data for the overflowing ones
