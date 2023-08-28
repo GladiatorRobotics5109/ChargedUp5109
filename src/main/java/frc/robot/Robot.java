@@ -62,6 +62,8 @@ public class Robot extends TimedRobot {
   
   private String m_autoSelected;
 
+  private boolean m_dontResetEncoderTeleop = false;
+
   // private Gripper m_gripper;
   private Arm m_arm = new Arm(11, 22, 0, true);
   
@@ -423,6 +425,7 @@ public class Robot extends TimedRobot {
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
+    if (!m_dontResetEncoderTeleop) m_swerve.resetEncoders();
     m_reached = true;
     m_aligning = false;
 
@@ -448,7 +451,7 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    m_lightController.setUnicornVomit((int)(m_swerve.navX.getAngle()/2), true);
+    m_lightController.setUnicornVomit((int)(m_swerve.navX.getAngle()/2), false);
     m_swerve.setMaxSpeed(m_driveMode.checkState(xController));
     if (xController.getRightTriggerAxis() > 0.5)
     {
@@ -514,6 +517,7 @@ public class Robot extends TimedRobot {
     m_swerve.resetEncoders();
     m_lightController.setAllianceColor(DriverStation.getAlliance());
     m_arm.initAuto();
+    m_dontResetEncoderTeleop = true;
     // System.out.println(Units.inchesToMeters(49));
     // m_arm.m_extenderController.setReference(Units.inchesToMeters(49), ControlType.kPosition);
     // m_arm.m_rotatorController.setReference(0, ControlType.kPosition);
