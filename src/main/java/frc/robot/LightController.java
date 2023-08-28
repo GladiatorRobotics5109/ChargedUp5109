@@ -103,22 +103,17 @@ public class LightController implements ITest {
     {
         int bufferLength = buffer.getLength();
         AddressableLEDBuffer fieldRelativeBuffer = new AddressableLEDBuffer(bufferLength);
-        int overflowStartIndex = 0;
+ //       int overflowStartIndex = 0;
 
         for (int i = 0; i < bufferLength; i++) // set LED data for non-overflowing LEDs
         {
-            if (i + heading > bufferLength)
-            {
-                overflowStartIndex = i;
-                break;
-            }
-            fieldRelativeBuffer.setLED(i + heading, buffer.getLED(i));
+            fieldRelativeBuffer.setLED((i + heading) % bufferLength, buffer.getLED(i));
         }
 
-        for (int i = 0; i < overflowStartIndex; i++) // set LED data for the overflowing ones
-        {
-            fieldRelativeBuffer.setLED(i, buffer.getLED(overflowStartIndex + i));
-        }
+        // for (int i = 0; i < overflowStartIndex; i++) // set LED data for the overflowing ones
+        // {
+        //     fieldRelativeBuffer.setLED(i, buffer.getLED(overflowStartIndex + i));
+        // }
 
         return fieldRelativeBuffer;
     } 
