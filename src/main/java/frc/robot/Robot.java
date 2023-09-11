@@ -449,9 +449,9 @@ public class Robot extends TimedRobot {
 //-2.8
 
   /** This function is called periodically during operator control. */
-  @Override
+  @Override 
   public void teleopPeriodic() {
-    m_lightController.setUnicornVomit((int)(m_swerve.navX.getAngle()/2), false);
+    m_lightController.setUnicornVomit((int)(m_swerve.navX.getAngle()/2), true);
     m_swerve.setMaxSpeed(m_driveMode.checkState(xController));
     if (xController.getRightTriggerAxis() > 0.5)
     {
