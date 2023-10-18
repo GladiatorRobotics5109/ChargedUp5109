@@ -33,6 +33,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.arm.Arm;
+import frc.robot.arm.ArmState;
 import frc.robot.arm.TargetExtension;
 import frc.robot.drivetrain.Drivetrain;
 import frc.robot.drivetrain.vision.ScoringController;
@@ -63,6 +64,8 @@ public class Robot extends TimedRobot {
   private String m_autoSelected;
 
   private boolean m_dontResetEncoderTeleop = false;
+
+  private boolean m_slowMode = false;
 
   // private Gripper m_gripper;
   private Arm m_arm = new Arm(11, 22, 0, true);
@@ -109,20 +112,24 @@ public class Robot extends TimedRobot {
   private int m_autoCounter = 0;
 
   private void driveWithJoystick(boolean fieldRelative) {
+    double speedScalar = 1;
+    if (m_slowMode) {
+      speedScalar = 0.15;
+    }
     /**
      * Get desired X speed of chassis.
      * Inverted since Xbox joysticks return flipped values.
      * 
      **/
-    final double xSpeed = -m_xspeedLimiter.calculate(MathUtil.applyDeadband(xController.getLeftY(), 0.2))
-        * m_swerve.m_maxSpeed;
+    final double xSpeed = (-m_xspeedLimiter.calculate(MathUtil.applyDeadband(xController.getLeftY(), 0.2))
+        * m_swerve.m_maxSpeed) * speedScalar;
     /**
      * Get desired Y (strafe/sideways) speed of chassis.
      * Positive = left, negative = right.
      * XBox controllers return flipped values.
      **/
-    final double ySpeed = -m_yspeedLimiter.calculate(MathUtil.applyDeadband(xController.getLeftX(), 0.2))
-        * m_swerve.m_maxSpeed;
+    final double ySpeed = (-m_yspeedLimiter.calculate(MathUtil.applyDeadband(xController.getLeftX(), 0.2))
+        * m_swerve.m_maxSpeed) * speedScalar;
     /**
      * Get desired rotation speed of chassis.
      * Positive = left, negative = right.
@@ -131,8 +138,8 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("driveX", xSpeed);
     SmartDashboard.putNumber("driveY", ySpeed);
     SmartDashboard.putBoolean("isClamping", m_arm.getClamping());
-    final double rot = -m_rotLimiter.calculate(MathUtil.applyDeadband(xController.getRightX(), 0.12))
-        * frc.robot.drivetrain.Drivetrain.kMaxAngularSpeed;
+    final double rot = (-m_rotLimiter.calculate(MathUtil.applyDeadband(xController.getRightX(), 0.12))
+        * frc.robot.drivetrain.Drivetrain.kMaxAngularSpeed) * speedScalar;
        
     m_swerve.drive(xSpeed, ySpeed, rot, fieldRelative);
   }
@@ -425,13 +432,15 @@ public class Robot extends TimedRobot {
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
-    if (!m_dontResetEncoderTeleop) m_swerve.resetEncoders();
+    if (!m_dontResetEncoderTeleop) { 
+      m_swerve.resetEncoders();
+      m_arm.initAuto();
+    }
     m_reached = true;
     m_aligning = false;
 
     // Comment out these two lines
-    // m_arm.initAuto();
-    // m_swerve.navX.reset();  
+    m_swerve.navX.reset();  
     m_swerve.coast();
     m_swerve.navX.setAngleAdjustment(180);
     switch (m_teleopChooser.getSelected()) {
@@ -461,7 +470,7 @@ public class Robot extends TimedRobot {
     {
       m_arm.grip();
     }
-    if (jStick.getRawButtonPressed(3))
+    if (jStick.getRawButtonPressed(3) && m_arm.getState() == ArmState.kReset)
     {
       m_pickupNotifier.startSingle(0.1);
     }
@@ -474,13 +483,13 @@ public class Robot extends TimedRobot {
       m_placeNotifier.startSingle(0.1);
     }
 
-    if (jStick.getRawButtonPressed(4)) {
+    if (jStick.getRawButtonPressed(4) && m_arm.getState() == ArmState.kReset) {
       m_coneNotifier.startSingle(0.1);
     }
     if (xController.getYButtonPressed()) {
       m_rotateNotifier.startSingle(0.1);
     }
-    if (jStick.getRawButtonPressed(5)) {
+    if (jStick.getRawButtonPressed(5) && m_arm.getState() == ArmState.kReset) {
       m_midNotifier.startSingle(0.1);
     }
     if (xController.getXButtonPressed()) {
@@ -494,6 +503,15 @@ public class Robot extends TimedRobot {
     if (xController.getAButtonPressed()) {
       m_reached = true;
     }
+
+    if (xController.getRightBumper()) {
+      m_slowMode = true;
+    }
+    else {
+      m_slowMode = false;
+    }
+
+
     if (!m_reached) {
       m_reached = m_swerve.driveTo(m_scoringController.continueInput());
     } else {

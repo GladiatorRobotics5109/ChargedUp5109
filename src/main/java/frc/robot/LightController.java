@@ -14,6 +14,7 @@ public class LightController implements ITest {
         m_addressableLED = new AddressableLED(lightStripChannel);
         m_ledBuffer = new AddressableLEDBuffer(lightChannelLength);
         m_addressableLED.setLength(m_ledBuffer.getLength());
+        
     }
 
     public void setAllianceColor(DriverStation.Alliance alliance) {
@@ -67,7 +68,7 @@ public class LightController implements ITest {
         m_addressableLED.start();
     }
 
-    // sets the lightstrips to be kevin's bugged out janked out bug
+    // sets the lightstrips to be kevin's bugged out janky half and half lighting
     public void setKevinsBuggedOutBug(int offset, boolean fieldRelative) {
 
         for (int i = 0; i < m_ledBuffer.getLength(); i++) {
@@ -103,8 +104,7 @@ public class LightController implements ITest {
     {
         int bufferLength = buffer.getLength();
         AddressableLEDBuffer fieldRelativeBuffer = new AddressableLEDBuffer(bufferLength);
-        int overflowStartIndex = 0;
-
+        
         for (int i = 0; i < bufferLength; i++) // set LED data for non-overflowing LEDs
         {
             // if (i + heading > bufferLength)
@@ -112,7 +112,7 @@ public class LightController implements ITest {
             //     overflowStartIndex = i;
             //     break;
             // }
-            fieldRelativeBuffer.setLED((i + heading)%bufferLength, buffer.getLED(i));
+            fieldRelativeBuffer.setLED((i + heading)%fieldRelativeBuffer.getLength(), buffer.getLED(i));
         }
 
         // for (int i = 0; i < overflowStartIndex; i++) // set LED data for the overflowing ones

@@ -36,7 +36,8 @@ public class Arm implements ITest, IInit {
 
 
     private final double kExtenderGearRatio = 100;
-    private final double kRotatorGearRatio = 4*4*3*24/9;
+    // private final double kRotatorGearRatio = 4*4*3*24/9;
+    private final double kRotatorGearRatio = 5*5*4*24/9;
     private final double kPulleyRadiusInitial = Units.millisecondsToSeconds(29.4);
     private final double kArmMinExtension = Units.inchesToMeters(35);
     private final double kArmMidExtension = 1.5;
@@ -46,7 +47,9 @@ public class Arm implements ITest, IInit {
     private final double kConeHeight = 15.92/100;
     private final double kTreyHeight = 1;
     public ArmState m_armState;
-    private double m_armPickupHeight = -Math.PI-Math.PI/24;
+    // private double m_armPickupHeight = -Math.PI-Math.PI/24;
+    // private double m_armPlaceHeight = Math.PI/8;
+    private double m_armPickupHeight = -Math.PI-(Math.PI/20);
     private double m_armPlaceHeight = Math.PI/8;
     public final ArmFeedforward m_armFeedForward = new ArmFeedforward(1, 0.84, 1.75);
 
@@ -89,7 +92,13 @@ public class Arm implements ITest, IInit {
         // m_rotatorController.setI(0);
         // m_rotatorController.setIZone(0);
         // m_rotatorController.setD(0.0000);
-        m_rotatorController.setP(0.5);
+
+
+        // m_rotatorController.setP(0.5);
+        // m_rotatorController.setI(0);
+        // m_rotatorController.setIMaxAccum(0.4, 0);
+        // m_rotatorController.setD(0);
+        m_rotatorController.setP(1.2);
         m_rotatorController.setI(0);
         m_rotatorController.setIMaxAccum(0.4, 0);
         m_rotatorController.setD(0);
@@ -102,7 +111,6 @@ public class Arm implements ITest, IInit {
         m_armState = ArmState.kReset;
         Timer.delay(.5);
         m_rotatorController.setReference(-Math.PI/2, ControlType.kPosition);
-        
     }
 
     /**
@@ -141,6 +149,7 @@ public class Arm implements ITest, IInit {
 
     public void pickup(Rotation2d theta) {
         // m_gripper.grip();
+
         m_rotatorController.setReference(theta.getRadians(), ControlType.kPosition);
         m_extenderController.setReference(Units.inchesToMeters(35), ControlType.kPosition);
         // m_gripper.release();
@@ -266,5 +275,9 @@ public class Arm implements ITest, IInit {
 
     public boolean getClamping() {
         return m_gripper.getClamping();
+    }
+
+    public ArmState getState() {
+        return m_armState;
     }
 }
