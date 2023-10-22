@@ -49,8 +49,9 @@ public class Arm implements ITest, IInit {
     public ArmState m_armState;
     // private double m_armPickupHeight = -Math.PI-Math.PI/24;
     // private double m_armPlaceHeight = Math.PI/8;
-    private double m_armPickupHeight = -Math.PI-(Math.PI/20);
-    private double m_armPlaceHeight = Math.PI/8;
+    // https://www.desmos.com/calculator/aiylg1qn8w <-- pickup height and place height explanation
+    private double m_armPickupHeight = -2.95; //-(Math.PI/40); /20 (pi - a little)
+    private double m_armPlaceHeight = 0.15; // /28; /10 (note: this should be very close to zero)
     public final ArmFeedforward m_armFeedForward = new ArmFeedforward(1, 0.84, 1.75);
 
     public Arm(int extenderChannel, int rotatorChannel, int gripperChannelForward, boolean isClamping) {
@@ -211,7 +212,7 @@ public class Arm implements ITest, IInit {
             case kHigh:
                 m_rotatorController.setReference(m_armPlaceHeight, ControlType.kPosition);
                 Timer.delay(0.2);
-                m_extenderController.setReference(Units.inchesToMeters(51.5), ControlType.kPosition);
+                m_extenderController.setReference(Units.inchesToMeters(60), ControlType.kPosition); // 51.5
                 break;
             case kMid:
                 m_rotatorController.setReference(0, ControlType.kPosition);
