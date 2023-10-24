@@ -438,7 +438,7 @@ public class Robot extends TimedRobot {
     }
     m_reached = true;
     m_aligning = false;
-
+    //m_arm.reset();
     // Comment out these two lines
     m_swerve.navX.reset();  
     m_swerve.coast();
