@@ -1,7 +1,9 @@
 package frc.robot.arm;
 
 public enum ArmState {
-    kPlacing,
+    kPlacingHigh,
+    kPlacingMid,
+    kPlacingLow,
     kPickup,
     kReset
 }

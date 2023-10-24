@@ -493,11 +493,11 @@ public class Robot extends TimedRobot {
       m_midNotifier.startSingle(0.1);
     }
     if (xController.getXButtonPressed()) {
-      m_arm.raise();
+      m_arm.changeHeight(1);
     }
 
     if (xController.getBButtonPressed()) {
-      m_arm.lower();
+      m_arm.changeHeight(-1);
     }
 
     if (xController.getAButtonPressed()) {
