@@ -203,8 +203,7 @@ public class Arm implements ITest, IInit {
                 m_armState = ArmState.kPlacingHigh;
                 m_rotatorController.setReference(m_armHighPlaceHeight, ControlType.kPosition);
                 Timer.delay(0.2);
-                m_extenderController.setReference(Units.inchesToMeters(60), ControlType.kPosition); // 51.5
-
+                m_extenderController.setReference(Units.inchesToMeters(51.5), ControlType.kPosition); // 51.5
                 break;
             case kMid:
                 m_armState = ArmState.kPlacingMid;
