@@ -349,80 +349,80 @@ public class Robot extends TimedRobot {
           //   m_autoCounter++;
           //   break;  
           case 0:
-        // m_arm.m_extenderController.setReference(Units.inchesToMeters(40), ControlType.kPosition);
-        Timer.delay(0.5);
-        m_autoCounter++;
-        break;
-        case 1:
-        m_arm.place(TargetExtension.kHigh);
-        Timer.delay(0.5);
-        m_swerve.drive(-1, 0, 0, true);
-        Timer.delay(1);
-        m_swerve.drive(0, 0, 0, true);
-        Timer.delay(0.5);
-        m_autoCounter++;
-        break;
-        case 2:
-        m_arm.m_gripper.release();
-        Timer.delay(0.5);
-        m_autoCounter++;
-        break;
-        case 3:
-          m_arm.m_gripper.grip();
-          m_swerve.drive(2, 0, 0, true);
-          m_arm.reset();
-          m_autoCounter++;
-          break;
-          case 4:
-          if (Math.abs(m_swerve.navX.getRoll())  - Constants.kNavXOffsetAlign > 6)  { // > 6(old) 10(new)
+          // m_arm.m_extenderController.setReference(Units.inchesToMeters(40), ControlType.kPosition);
+            Timer.delay(0.5);
+            m_autoCounter++;
+            break;
+          case 1:
+            m_arm.place(TargetExtension.kHigh);
+            Timer.delay(0.5);
+            m_swerve.drive(-1, 0, 0, true);
+            Timer.delay(1);
             m_swerve.drive(0, 0, 0, true);
+            Timer.delay(0.5);
             m_autoCounter++;
-          }  
-          break;
+            break;
+          case 2:
+            m_arm.m_gripper.release();
+            Timer.delay(0.5);
+            m_autoCounter++;
+            break;
+          case 3:
+            m_arm.m_gripper.grip();
+            m_swerve.drive(2, 0, 0, true);
+            m_arm.reset();
+            m_autoCounter++;
+            break;
+          case 4:
+            if (Math.abs(m_swerve.navX.getRoll())  - Constants.kNavXOffsetAlign > 6)  { // > 6(old) 10(new)
+              m_swerve.drive(0, 0, 0, true);
+              m_autoCounter++;
+            }  
+            break;
           case 5:
-          boolean balanced = m_swerve.autoBalance();
+            boolean balanced = m_swerve.autoBalance();
 
-          if (balanced || Timer.getMatchTime() < 2) {
-            m_autoCounter++;
+            if (balanced || Timer.getMatchTime() < 2) {
+              m_autoCounter++;
+            }
+            break;
+          case 6:
+            m_lightController.setBalanceColor();
+            m_swerve.drive(0,0,0,true);
+            m_swerve.brake();
           }
           break;
-          case 6:
-          m_lightController.setBalanceColor();
-          m_swerve.drive(0,0,0,true);
-          m_swerve.brake();
-        }
-        break;
       case kDefaultAuto:
-      switch(m_autoCounter) {
-        case 0:
-        // m_arm.m_extenderController.setReference(Units.inchesToMeters(40), ControlType.kPosition);
-        Timer.delay(0.5);
-        m_autoCounter++;
-        break;
-        case 1:
-        m_arm.place(TargetExtension.kHigh);
-        Timer.delay(0.5);
-        m_swerve.drive(-1, 0, 0, true);
-        Timer.delay(1);
-        m_swerve.drive(0, 0, 0, true);
-        Timer.delay(0.5);
-        m_autoCounter++;
-        break;
-        case 2:
-        m_arm.m_gripper.release();
-        Timer.delay(2);
-        m_autoCounter++;
-        break;
-        case 3:
-          m_arm.m_gripper.grip();
-          m_swerve.drive(4, 0, 0, true);
-          Timer.delay(3);
-          m_swerve.drive(0, 0, 0, true);
-          m_arm.reset();
-          m_autoCounter++;
-          break;
+        switch(m_autoCounter) {
+          case 0:
+            // m_arm.m_extenderController.setReference(Units.inchesToMeters(40), ControlType.kPosition);
+            Timer.delay(0.5);
+            m_autoCounter++;
+            break;
+          case 1:
+            m_arm.place(TargetExtension.kHigh);
+            Timer.delay(0.5);
+            m_swerve.drive(-1, 0, 0, true);
+            Timer.delay(1);
+            m_swerve.drive(0, 0, 0, true);
+            Timer.delay(0.5);
+            m_autoCounter++;
+            break;
+          case 2:
+            m_arm.m_gripper.release();
+            Timer.delay(2);
+            m_autoCounter++;
+            break;
+          case 3:
+            m_arm.m_gripper.grip();
+            m_swerve.drive(4, 0, 0, true);
+            Timer.delay(3);
+            m_swerve.drive(0, 0, 0, true);
+            m_arm.reset();
+            m_autoCounter++;
+            break;
+        }
       }
-    }
 
     SmartDashboard.putNumber("autoCounter", m_autoCounter);
   }
