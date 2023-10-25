@@ -17,6 +17,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.ProfiledPIDCommand;
 import frc.robot.util.IInit;
 import frc.robot.util.ITest;
@@ -50,7 +51,7 @@ public class Arm implements ITest, IInit {
     // private double m_armPickupHeight = -Math.PI-Math.PI/24;
     // private double m_armPlaceHeight = Math.PI/8;
     // https://www.desmos.com/calculator/aiylg1qn8w <-- pickup height and place height explanation
-    private double m_armPickupHeight = -3.05; //-(Math.PI/40); /20 (pi - a little) -2.98
+    private double m_armPickupHeight = -3.08; //-(Math.PI/40); /20 (pi - a little) -2.98   //-3.05
     private double m_armPlaceHeight = 0.1; // /28; /10 (note: this should be very close to zero)
     public final ArmFeedforward m_armFeedForward = new ArmFeedforward(1, 0.84, 1.75);
 
@@ -175,8 +176,13 @@ public class Arm implements ITest, IInit {
                 break;
             default:
                 break;
+            
 
         }
+        SmartDashboard.putNumber("m_armPickupHeight", m_armPickupHeight);
+        SmartDashboard.putNumber("m_armPlaceHeight", m_armPlaceHeight);
+
+
     }
 
     public void lower() {
@@ -195,6 +201,8 @@ public class Arm implements ITest, IInit {
                 break;
 
         }
+        SmartDashboard.putNumber("m_armPickupHeight", m_armPickupHeight);
+        SmartDashboard.putNumber("m_armPlaceHeight", m_armPlaceHeight);
     }
 
 
@@ -215,7 +223,7 @@ public class Arm implements ITest, IInit {
                 m_extenderController.setReference(Units.inchesToMeters(51.5), ControlType.kPosition); // 51.5
                 break;
             case kMid:
-                m_rotatorController.setReference(0, ControlType.kPosition);
+                m_rotatorController.setReference(-0.15, ControlType.kPosition); //0 radians
                 break;
             case kLow:
                 break;
