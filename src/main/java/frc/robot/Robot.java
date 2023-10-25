@@ -103,6 +103,7 @@ public class Robot extends TimedRobot {
   private Notifier m_coneNotifier;
   private Notifier m_midNotifier;
   private Notifier m_rotateNotifier;
+  private Notifier m_lowNotifier;
 
   private HashMap<Integer, Pose2d> m_scoringMap = new HashMap<>();
   private ScoringController m_scoringController = new ScoringController(m_scoringMap);
@@ -194,6 +195,12 @@ public class Robot extends TimedRobot {
     m_midNotifier = new Notifier(new Runnable() {
       public void run() {
         m_arm.place(TargetExtension.kMid);
+      }
+    });
+
+    m_lowNotifier = new Notifier(new Runnable() {
+      public void run() {
+        m_arm.place(TargetExtension.kLow);
       }
     });
     // m_swerve.m_frontLeft.m_driveEncoder.setPosition(0);
@@ -460,8 +467,20 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override 
   public void teleopPeriodic() {
-    // m_lightController.setUnicornVomit((int)(m_swerve.navX.getAngle()/2), true);
-    m_swerve.setMaxSpeed(m_driveMode.checkState(xController));
+    try {
+      
+      // m_lightController.setUnicornVomit((int)(m_swerve.navX.getAngle()/2), true);
+
+    } catch (Exception e) {
+      System.out.println("Error: " + e + "\n");
+      e.printStackTrace();
+    }
+    
+
+    //lowest speed max is 0.3 * 10 = 3, and highest max speed is 10? maybe 15
+    m_swerve.setMaxSpeed(12*xController.getLeftTriggerAxis() + 3);
+
+    //m_swerve.setMaxSpeed(m_driveMode.checkState(xController));
     if (xController.getRightTriggerAxis() > 0.5)
     {
       m_arm.release();
@@ -492,12 +511,15 @@ public class Robot extends TimedRobot {
     if (jStick.getRawButtonPressed(5) && m_arm.getState() == ArmState.kReset) {
       m_midNotifier.startSingle(0.1);
     }
+    if (jStick.getRawButtonPressed(10) && m_arm.getState() == ArmState.kReset) {
+      m_lowNotifier.startSingle(0.1);
+    }
     if (xController.getXButtonPressed()) {
-      m_arm.raise();
+      m_arm.changeHeight(1);
     }
 
     if (xController.getBButtonPressed()) {
-      m_arm.lower();
+      m_arm.changeHeight(-1);
     }
 
     if (xController.getAButtonPressed()) {

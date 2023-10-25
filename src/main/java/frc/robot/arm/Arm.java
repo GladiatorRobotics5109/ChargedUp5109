@@ -51,8 +51,10 @@ public class Arm implements ITest, IInit {
     // private double m_armPickupHeight = -Math.PI-Math.PI/24;
     // private double m_armPlaceHeight = Math.PI/8;
     // https://www.desmos.com/calculator/aiylg1qn8w <-- pickup height and place height explanation
-    private double m_armPickupHeight = -3.08; //-(Math.PI/40); /20 (pi - a little) -2.98   //-3.05
-    private double m_armPlaceHeight = 0.1; // /28; /10 (note: this should be very close to zero)
+    private double m_armPickupHeight = -3.08; //-(Math.PI/40); /20 (pi - a little)
+    private double m_armHighPlaceHeight = 0.1; // /28; /10 (note: this should be very close to zero)
+    private double m_armMidPlaceHeight = -0.15;
+    private double m_armLowPlaceHeight = 0.0000;
     public final ArmFeedforward m_armFeedForward = new ArmFeedforward(1, 0.84, 1.75);
 
     public Arm(int extenderChannel, int rotatorChannel, int gripperChannelForward, boolean isClamping) {
@@ -144,7 +146,7 @@ public class Arm implements ITest, IInit {
         Timer.delay(0.4);
         m_extenderController.setReference(Units.inchesToMeters(55), ControlType.kPosition);
     }
-
+    
     public void pickupCone() {
         pickupCone(Units.inchesToMeters(53), TargetExtension.kLow, true);
     }
@@ -161,51 +163,34 @@ public class Arm implements ITest, IInit {
         m_armState = ArmState.kPickup;
         pickup(Rotation2d.fromRadians(m_armPickupHeight));
     }
-
-    public void raise() {
+    
+    public void changeHeight(int sign) {
         switch (m_armState) {
             case kPickup:
-                m_armPickupHeight -= Math.PI/48;
+                m_armPickupHeight += sign*Math.PI/48;
                 m_rotatorController.setReference(m_armPickupHeight, ControlType.kPosition);
                 break;
-            case kPlacing:
-                m_armPlaceHeight += Math.PI/48;
-                m_rotatorController.setReference(m_armPlaceHeight, ControlType.kPosition);
+            case kPlacingHigh:
+                m_armHighPlaceHeight += sign*Math.PI/48;
+                m_rotatorController.setReference(m_armHighPlaceHeight, ControlType.kPosition);
+                break;
+            case kPlacingMid:
+                m_armMidPlaceHeight += sign*Math.PI/48;
+                m_rotatorController.setReference(m_armMidPlaceHeight, ControlType.kPosition);
+                break;
+            case kPlacingLow:
                 break;
             case kReset:
                 break;
             default:
                 break;
-            
-
-        }
-        SmartDashboard.putNumber("m_armPickupHeight", m_armPickupHeight);
-        SmartDashboard.putNumber("m_armPlaceHeight", m_armPlaceHeight);
-
-
-    }
-
-    public void lower() {
-        switch (m_armState) {
-            case kPickup:
-                m_armPickupHeight += Math.PI/48;
-                m_rotatorController.setReference(m_armPickupHeight, ControlType.kPosition);
-                break;
-            case kPlacing:
-                m_armPlaceHeight -= Math.PI/48;
-                m_rotatorController.setReference(m_armPlaceHeight, ControlType.kPosition);
-                break;
-            case kReset:
-                break;
-            default:
-                break;
-
         }
         SmartDashboard.putNumber("m_armPickupHeight", m_armPickupHeight);
         SmartDashboard.putNumber("m_armPlaceHeight", m_armPlaceHeight);
     }
 
 
+    //NOT USED
     public Translation3d getGripperPosition(Translation2d robotPosition) {
         Translation2d gripperRelPose = new Translation2d(m_extenderEncoder.getPosition(), Rotation2d.fromRadians(m_rotatorEncoder.getPosition()));
         gripperRelPose = gripperRelPose.plus(kAxisofRotation);
@@ -214,18 +199,22 @@ public class Arm implements ITest, IInit {
     }
 
     public void place(TargetExtension target) {
-        m_armState = ArmState.kPlacing;
+        
         // m_gripper.grip();
         switch (target) {
             case kHigh:
-                m_rotatorController.setReference(m_armPlaceHeight, ControlType.kPosition);
+                m_armState = ArmState.kPlacingHigh;
+                m_rotatorController.setReference(m_armHighPlaceHeight, ControlType.kPosition);
                 Timer.delay(0.2);
                 m_extenderController.setReference(Units.inchesToMeters(51.5), ControlType.kPosition); // 51.5
                 break;
             case kMid:
-                m_rotatorController.setReference(-0.15, ControlType.kPosition); //0 radians
+                m_armState = ArmState.kPlacingMid;
+                m_rotatorController.setReference(m_armMidPlaceHeight, ControlType.kPosition);
                 break;
             case kLow:
+                m_armState = ArmState.kPlacingLow;
+                m_rotatorController.setReference(m_armLowPlaceHeight, ControlType.kPosition);
                 break;
         }
         // m_gripper.release();
