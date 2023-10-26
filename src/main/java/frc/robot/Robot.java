@@ -97,7 +97,7 @@ public class Robot extends TimedRobot {
 
   private ControllerState controllerState = new ControllerState();
 
-  private Notifier m_placeNotifier;
+  private Notifier m_highNotifier;
   private Notifier m_resetNotifier;
   private Notifier m_pickupNotifier;
   private Notifier m_coneNotifier;
@@ -115,7 +115,7 @@ public class Robot extends TimedRobot {
   private void driveWithJoystick(boolean fieldRelative) {
     double speedScalar = 1;
     if (m_slowMode) {
-      speedScalar = 0.15;
+      speedScalar = 0.3 ;
     }
     /**
      * Get desired X speed of chassis.
@@ -152,7 +152,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     Constants.kNavXOffsetAlign = m_swerve.navX.getRoll();
-    m_placeNotifier = new Notifier(new Runnable() {
+    m_highNotifier = new Notifier(new Runnable() {
       public void run() {
         m_arm.place();
       }
@@ -469,7 +469,7 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     try {
       
-      // m_lightController.setUnicornVomit((int)(m_swerve.navX.getAngle()/2), true);
+       //m_lightController.setUnicornVomit((int)(m_swerve.navX.getAngle()/2), true);
 
     } catch (Exception e) {
       System.out.println("Error: " + e + "\n");
@@ -477,9 +477,9 @@ public class Robot extends TimedRobot {
     }
     
 
-    //lowest speed max is 0.3 * 10 = 3, and highest max speed is 10? maybe 15
+    //lowest speed max is 0.3 * 10 = 3, and hig hest max speed is 10? maybe 15
     m_swerve.setMaxSpeed(12*xController.getLeftTriggerAxis() + 3);
-
+    System.out.println(12*xController.getLeftTriggerAxis() + 3);
     //m_swerve.setMaxSpeed(m_driveMode.checkState(xController));
     if (xController.getRightTriggerAxis() > 0.5)
     {
@@ -499,7 +499,7 @@ public class Robot extends TimedRobot {
     }
     if (jStick.getTriggerPressed())
     {
-      m_placeNotifier.startSingle(0.1);
+      m_highNotifier.startSingle(0.1);
     }
 
     if (jStick.getRawButtonPressed(4) && m_arm.getState() == ArmState.kReset) {
@@ -511,8 +511,9 @@ public class Robot extends TimedRobot {
     if (jStick.getRawButtonPressed(5) && m_arm.getState() == ArmState.kReset) {
       m_midNotifier.startSingle(0.1);
     }
-    if (jStick.getRawButtonPressed(10) && m_arm.getState() == ArmState.kReset) {
+    if (jStick.getRawButtonPressed(11) && m_arm.getState() == ArmState.kReset) {
       m_lowNotifier.startSingle(0.1);
+      System.out.println("Button 11 pressed!");
     }
     if (xController.getXButtonPressed()) {
       m_arm.changeHeight(1);

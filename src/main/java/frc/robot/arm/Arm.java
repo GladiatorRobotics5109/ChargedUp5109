@@ -51,10 +51,11 @@ public class Arm implements ITest, IInit {
     // private double m_armPickupHeight = -Math.PI-Math.PI/24;
     // private double m_armPlaceHeight = Math.PI/8;
     // https://www.desmos.com/calculator/aiylg1qn8w <-- pickup height and place height explanation
-    private double m_armPickupHeight = -3.08; //-(Math.PI/40); /20 (pi - a little)
+    private double m_armPickupHeight = -3.11; //-(Math.PI/40); /20 (pi - a little)
     private double m_armHighPlaceHeight = 0.1; // /28; /10 (note: this should be very close to zero)
     private double m_armMidPlaceHeight = -0.15;
-    private double m_armLowPlaceHeight = 0.0000;
+    private double m_armLowPlaceHeight = -1.095;
+    ;
     public final ArmFeedforward m_armFeedForward = new ArmFeedforward(1, 0.84, 1.75);
 
     public Arm(int extenderChannel, int rotatorChannel, int gripperChannelForward, boolean isClamping) {
@@ -155,7 +156,7 @@ public class Arm implements ITest, IInit {
         // m_gripper.grip();
 
         m_rotatorController.setReference(theta.getRadians(), ControlType.kPosition);
-        m_extenderController.setReference(Units.inchesToMeters(35), ControlType.kPosition);
+        //m_extenderController.setReference(Units.inchesToMeters(35), ControlType.kPosition);
         // m_gripper.release();
     }
 
@@ -186,7 +187,9 @@ public class Arm implements ITest, IInit {
                 break;
         }
         SmartDashboard.putNumber("m_armPickupHeight", m_armPickupHeight);
-        SmartDashboard.putNumber("m_armPlaceHeight", m_armPlaceHeight);
+        SmartDashboard.putNumber("m_armPlaceHeight", m_armHighPlaceHeight);
+        SmartDashboard.putNumber("m_armPlaceHeight", m_armMidPlaceHeight);
+        SmartDashboard.putNumber("m_armPlaceHeight", m_armLowPlaceHeight);       
     }
 
 
