@@ -52,8 +52,9 @@ import java.util.HashMap;
  * project.
  */
 public class Robot extends TimedRobot {
-  private static final String kTaxiAuto = "Taxi";
-  private static final String kRampAuto = "Ramp";
+  private static final String kHighCubeTaxiAuto = "Taxi"; // place high cube
+  private static final String kCubeAuto = "Cube"; // place high cube and taxi
+  private static final String kRampAuto = "Ramp"; // auto balance
 
   private static final String kKevinMode = "kKevinMode";
   private static final String kWillMode = "kWillMode";
@@ -212,9 +213,10 @@ public class Robot extends TimedRobot {
     // CameraServer.startAutomaticCapture();
     // CvSink cvSink = CameraServer.getVideo();
     // CvSource outputStream = CameraServer.putVideo("Blur", 680, 420);
-    m_chooser.setDefaultOption("Default Auto", kTaxiAuto);
+    m_chooser.setDefaultOption("Default Auto", kCubeAuto);
     SmartDashboard.putBoolean("isClamping", m_arm.getClamping());
     m_chooser.addOption("My Auto", kRampAuto);
+    m_chooser.addOption("Cube Auto", kCubeAuto);
     m_teleopChooser.setDefaultOption("kWillMode", kWillMode);
     m_teleopChooser.addOption("kKevinMode", kKevinMode);
     SmartDashboard.putData("Auto choices", m_chooser);
@@ -313,7 +315,8 @@ public class Robot extends TimedRobot {
     m_autoCounter = 0;
     target = new Pose2d(new Translation2d(0, -2), new Rotation2d(0));
     m_swerve.resetEncoders();
-    m_autoSelected = SmartDashboard.getString("Auto choices", kTaxiAuto);
+    m_autoSelected = SmartDashboard.getString("Auto choices", kCubeAuto);
+    m_autoSelected = kCubeAuto; // autoSelect
     System.out.println("Auto selected: " + m_autoSelected);
     Timer.delay(1);
     m_arm.initAuto(); 
@@ -402,11 +405,11 @@ public class Robot extends TimedRobot {
             m_swerve.brake();
           }
           break;
-      case kTaxiAuto:
+      case kHighCubeTaxiAuto:
         switch(m_autoCounter) {
           case 0:
             // m_arm.m_extenderController.setReference(Units.inchesToMeters(40), ControlType.kPosition);
-            Timer.delay(0.5);
+            Timer.delay(4);
             m_autoCounter++;
             break;
           case 1:
@@ -425,13 +428,45 @@ public class Robot extends TimedRobot {
             break;
           case 3:
             m_arm.m_gripper.grip();
-            m_swerve.drive(1, 0, 0, true); // (4, 0, 0, true)
-            Timer.delay(2); // 3
+            m_swerve.drive(2, 0, 0, true); // (4, 0, 0, true)
+            Timer.delay(3); // 3
             m_swerve.drive(0, 0, 0, true);
             m_arm.reset();
             m_autoCounter++;
             break;
         }
+        break;
+        case kCubeAuto:
+          switch(m_autoCounter) {
+            case 0:
+              // m_arm.m_extenderController.setReference(Units.inchesToMeters(40), ControlType.kPosition);
+              Timer.delay(4);
+              m_autoCounter++;
+              break;
+            case 1:
+              m_arm.place(TargetExtension.kHigh);
+              Timer.delay(0.5);
+              m_swerve.drive(-1, 0, 0, true);
+              Timer.delay(1);
+              m_swerve.drive(0, 0, 0, true);
+              Timer.delay(0.5);
+              m_autoCounter++;
+              break;
+            case 2:
+              m_arm.m_gripper.release();
+              Timer.delay(2);
+              m_autoCounter++;
+              break;
+            case 3:
+              m_arm.m_gripper.grip();
+              m_swerve.drive(1, 0, 0, true);
+              Timer.delay(0.7);
+              m_swerve.drive(0, 0, 0, true);
+              m_arm.reset();
+              m_autoCounter++;
+              break;
+          }
+          break;
       }
 
     SmartDashboard.putNumber("autoCounter", m_autoCounter);
@@ -559,7 +594,7 @@ public class Robot extends TimedRobot {
   @Override
   public void testInit() {
     m_swerve.resetEncoders();
-    m_lightController.setAllianceColor(DriverStation.gccetAlliance());
+    m_lightController.setAllianceColor(DriverStation.getAlliance());
     m_arm.initAuto();
     m_autoRan = true;
     // System.out.println(Units.inchesToMeters(49));
