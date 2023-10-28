@@ -52,8 +52,8 @@ import java.util.HashMap;
  * project.
  */
 public class Robot extends TimedRobot {
-  private static final String kDefaultAuto = "Taxi";
-  private static final String kCustomAuto = "Ramp";
+  private static final String kTaxiAuto = "Taxi";
+  private static final String kRampAuto = "Ramp";
 
   private static final String kKevinMode = "kKevinMode";
   private static final String kWillMode = "kWillMode";
@@ -63,7 +63,8 @@ public class Robot extends TimedRobot {
   
   private String m_autoSelected;
 
-  private boolean m_dontResetEncoderTeleop = false;
+  // autonomous has run
+  private boolean m_autoRan = false;
 
   private boolean m_slowMode = false;
 
@@ -211,9 +212,9 @@ public class Robot extends TimedRobot {
     // CameraServer.startAutomaticCapture();
     // CvSink cvSink = CameraServer.getVideo();
     // CvSource outputStream = CameraServer.putVideo("Blur", 680, 420);
-    m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
+    m_chooser.setDefaultOption("Default Auto", kTaxiAuto);
     SmartDashboard.putBoolean("isClamping", m_arm.getClamping());
-    m_chooser.addOption("My Auto", kCustomAuto);
+    m_chooser.addOption("My Auto", kRampAuto);
     m_teleopChooser.setDefaultOption("kWillMode", kWillMode);
     m_teleopChooser.addOption("kKevinMode", kKevinMode);
     SmartDashboard.putData("Auto choices", m_chooser);
@@ -312,12 +313,14 @@ public class Robot extends TimedRobot {
     m_autoCounter = 0;
     target = new Pose2d(new Translation2d(0, -2), new Rotation2d(0));
     m_swerve.resetEncoders();
-    m_autoSelected = SmartDashboard.getString("Auto choices", kDefaultAuto);
+    m_autoSelected = SmartDashboard.getString("Auto choices", kTaxiAuto);
     System.out.println("Auto selected: " + m_autoSelected);
     Timer.delay(1);
     m_arm.initAuto(); 
     m_arm.m_gripper.grip();
     m_swerve.coast();
+
+    m_autoRan = true;
   }
 
   /** This function is called periodically during autonomous. */
@@ -325,7 +328,7 @@ public class Robot extends TimedRobot {
   public void autonomousPeriodic() {
     System.out.println("Auto selected: " + m_autoSelected); 
     switch (m_autoSelected) {
-      case kCustomAuto:
+      case kRampAuto:
         SmartDashboard.putNumber("autonThing", 0);
         // Put custom auto code here
         switch (m_autoCounter) {
@@ -399,7 +402,7 @@ public class Robot extends TimedRobot {
             m_swerve.brake();
           }
           break;
-      case kDefaultAuto:
+      case kTaxiAuto:
         switch(m_autoCounter) {
           case 0:
             // m_arm.m_extenderController.setReference(Units.inchesToMeters(40), ControlType.kPosition);
@@ -422,8 +425,8 @@ public class Robot extends TimedRobot {
             break;
           case 3:
             m_arm.m_gripper.grip();
-            m_swerve.drive(4, 0, 0, true);
-            Timer.delay(3);
+            m_swerve.drive(1, 0, 0, true); // (4, 0, 0, true)
+            Timer.delay(2); // 3
             m_swerve.drive(0, 0, 0, true);
             m_arm.reset();
             m_autoCounter++;
@@ -439,7 +442,7 @@ public class Robot extends TimedRobot {
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
-    if (!m_dontResetEncoderTeleop) { 
+    if (!m_autoRan) { 
       m_swerve.resetEncoders();
       m_arm.initAuto();
     }
@@ -556,9 +559,9 @@ public class Robot extends TimedRobot {
   @Override
   public void testInit() {
     m_swerve.resetEncoders();
-    m_lightController.setAllianceColor(DriverStation.getAlliance());
+    m_lightController.setAllianceColor(DriverStation.gccetAlliance());
     m_arm.initAuto();
-    m_dontResetEncoderTeleop = true;
+    m_autoRan = true;
     // System.out.println(Units.inchesToMeters(49));
     // m_arm.m_extenderController.setReference(Units.inchesToMeters(49), ControlType.kPosition);
     // m_arm.m_rotatorController.setReference(0, ControlType.kPosition);
